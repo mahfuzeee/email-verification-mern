@@ -3,7 +3,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const connectDB = require("../config/db");
 const User = require("../models/User");
-const sendVerificationEmail = require("../utils/emailVerification");
+const {
+  sendVerificationEmail,
+  sendOTPEmail,
+} = require("../utils/emailVerification");
 
 //MongoDB connection and data handling
 connectDB();
@@ -48,21 +51,44 @@ const login = async (req, res) => {
 const verifyByEmail = async (req, res) => {
   const { token } = req.params;
 
-  // 1. Find user by token
-  const user = await User.findOne({ verificationToken: token });
+  try {
+    // 1. Find user by token
+    const user = await User.findOne({ verificationToken: token });
 
-  // 2. Validate token and expiration
-  if (!user || user.verificationExpiresAt < new Date()) {
-    return res.status(400).send("Invalid or expired token.");
+    // 2. Validate token and expiration
+    if (!user || user.verificationExpiresAt < new Date()) {
+      return res.status(400).send("Invalid or expired token.");
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: "Already verified" });
+    }
+    // 3. Update user as verified
+    user.isVerified = true;
+    user.verificationToken = undefined; // Clear the token
+    await user.save();
+
+    res.send("Email verified successfully!");
+  } catch (err) {
+    res.status(500).json({ message: "Server Error.!" });
   }
+};
 
-  // 3. Update user as verified
-  user.isVerified = true;
-  user.verificationToken = undefined; // Clear the token
-  await user.save();
+//Function for send OTP to email
+const sendOTP = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    let user = await User.findOne({ email });
+    if (user && user.isVerified)
+      return res.status(400).json({ message: "Email already registered" });
 
-  res.send("Email verified successfully!");
+    await sendOTPEmail(user);
+
+    res.json({ message: "OTP sent to your email" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 //Exporting modules
-module.exports = { register, login, verifyByEmail };
+module.exports = { register, login, verifyByEmail, sendOTP };

@@ -8,6 +8,8 @@ const userSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false },
   verificationToken: String,
   verificationExpiresAt: Date,
+  otpHashed: String,
+  otpExpiry: Date,
 });
 
 // 2. Compile Schema into a Model
