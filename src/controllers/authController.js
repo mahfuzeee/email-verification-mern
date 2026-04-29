@@ -23,7 +23,12 @@ const register = async (req, res) => {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
-  res.status(201).json({ token, user: { id: user._id, name, email } });
+  res.status(201).json({
+    status: "success",
+    token,
+    user: { id: user._id, name, email },
+    message: "A verification link has been sent to your email.",
+  });
 };
 
 //Login Function
@@ -86,9 +91,39 @@ const sendOTP = async (req, res) => {
 
     res.json({ message: "OTP sent to your email" });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ status: "fail", message: err.message });
+  }
+};
+
+//Function for verify OTP
+const verifyOTP = async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.isVerified)
+      return res.status(400).json({ message: "Already verified" });
+
+    if (user.otpExpiry < Date.now())
+      return res.status(400).json({ error: "OTP expired" });
+    const valid = await bcrypt.compare(otp, user.otpHashed);
+    if (!valid) return res.status(400).json({ error: "Invalid OTP" });
+    await User.findByIdAndUpdate(user._id, {
+      isVerified: true,
+      otpHashed: null,
+      otpExpiry: null,
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Email verified succesfully.",
+    });
+  } catch (err) {
+    res.status(400).json({ status: "fail", message: err.message });
   }
 };
 
 //Exporting modules
-module.exports = { register, login, verifyByEmail, sendOTP };
+module.exports = { register, login, verifyByEmail, sendOTP, verifyOTP };
