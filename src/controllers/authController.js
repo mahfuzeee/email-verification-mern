@@ -71,6 +71,7 @@ const verifyByEmail = async (req, res) => {
     // 3. Update user as verified
     user.isVerified = true;
     user.verificationToken = undefined; // Clear the token
+    user.verificationExpiresAt = undefined; //clear expire time
     await user.save();
 
     res.send("Email verified successfully!");
@@ -84,6 +85,7 @@ const sendOTP = async (req, res) => {
   const { email, password } = req.body;
   try {
     let user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "user not found." });
     if (user && user.isVerified)
       return res.status(400).json({ message: "Email already registered" });
 

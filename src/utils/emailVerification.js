@@ -16,11 +16,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+//Function for token generation send verification link to email
 const sendVerificationEmail = async (user) => {
   const token = crypto.randomBytes(32).toString("hex");
   user.verificationToken = token;
-  user.verificatonExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
+  user.verificationExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
   await user.save();
+
   await transporter.sendMail({
     to: user.email,
     subject: "Verify your email.",
@@ -28,6 +30,7 @@ const sendVerificationEmail = async (user) => {
   });
 };
 
+//Function for generating and sending OTP to email.
 const sendOTPEmail = async (user) => {
   // Helper: generate 6-digit OTP
   const generateOTP = () => crypto.randomInt(100000, 999999).toString();

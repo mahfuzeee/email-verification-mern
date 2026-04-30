@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const authRoutes = require("./src/routes/authRoutes");
 
 //Defining Port
@@ -9,6 +10,8 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Use this to allow all origins (simplest for development)
+app.use(cors());
 
 //Using Auth Routes
 app.use("/api/auth", authRoutes);
