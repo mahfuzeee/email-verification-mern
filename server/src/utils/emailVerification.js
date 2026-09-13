@@ -4,12 +4,10 @@ const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = process.env.BASE_URL;
 
 const transporter = nodemailer.createTransport({
-  secure: true,
-  host: "smtp.gmail.com",
-  port: 465,
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -23,11 +21,19 @@ const sendVerificationEmail = async (user) => {
   user.verificationExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
   await user.save();
 
-  await transporter.sendMail({
-    to: user.email,
-    subject: "Verify your email.",
-    html: `<p>Click <a href='${BASE_URL}/api/auth/verify/${token}'>here</a> to verify your email.</p>`,
-  });
+  transporter.sendMail(
+    {
+      to: user.email,
+      subject: "Verify your email.",
+      html: `<p>Click <a href='${BASE_URL}/api/auth/verify/${token}'>here</a> to verify your email.</p>`,
+    },
+    (err, info) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log(`Email sent: ${info.response}`);
+    },
+  );
 };
 
 //Function for generating and sending OTP to email.

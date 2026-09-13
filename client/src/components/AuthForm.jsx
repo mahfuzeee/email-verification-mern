@@ -1,4 +1,5 @@
 import { useState } from "react";
+import userApi from "../api/userApi";
 
 export default function AuthForm() {
   const [mode, setMode] = useState("login");
@@ -17,7 +18,7 @@ export default function AuthForm() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (mode === "register" && formData.password !== formData.confirmPassword) {
@@ -29,6 +30,16 @@ export default function AuthForm() {
       mode === "register" ? "Register form submitted" : "Login form submitted",
       formData,
     );
+
+    try {
+      if (mode === "register") {
+        await userApi.post("/register", formData);
+      } else {
+        await userApi.post("/login", formData);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
