@@ -8,9 +8,6 @@ const {
   sendOTPEmail,
 } = require("../utils/emailVerification");
 
-//MongoDB connection and data handling
-connectDB();
-
 //Resister function
 const register = async (req, res) => {
   const { name, email, password } = req.body;
