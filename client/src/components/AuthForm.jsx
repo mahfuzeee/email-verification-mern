@@ -1,6 +1,7 @@
 import { useState } from "react";
 import userApi from "../api/userApi";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function AuthForm() {
   const [mode, setMode] = useState("login");
@@ -10,6 +11,8 @@ export default function AuthForm() {
     password: "",
     confirmPassword: "",
   });
+
+  const navigate = useNavigate();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -39,6 +42,9 @@ export default function AuthForm() {
       } else {
         const res = await userApi.post("/login", formData);
         toast.success(res.data.message);
+        if (res.data.success) {
+          navigate("/dashboard");
+        }
       }
     } catch (error) {
       console.error(error);
