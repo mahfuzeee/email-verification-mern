@@ -46,11 +46,17 @@ const login = async (req, res) => {
 
   //find user by email
   const user = await User.findOne({ email });
-  if (!user) return res.status(401).json({ error: "Invalid credentials" });
+  if (!user)
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid credentials" });
 
   //check the password
   const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.status(401).json({ error: "Invalid credentials" });
+  if (!match)
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid credentials" });
 
   const token = jwt.sign(
     { id: user._id, role: user.role },
@@ -69,6 +75,7 @@ const login = async (req, res) => {
   res.status(200).json({
     success: true,
     message: "Logged in succesfull",
+    user,
   });
 };
 

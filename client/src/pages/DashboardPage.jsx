@@ -1,19 +1,20 @@
-import React from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-export default function DashboardPage({ user = null, onLoginSuccess = null }) {
+export default function DashboardPage() {
+  const { user, logout } = useAuth();
   const serverUser = user || {
     name: "Guest User",
     email: "guest@example.com",
     isVerified: false,
   };
 
-  const goToDashboard = () => {
-    if (onLoginSuccess) {
-      onLoginSuccess(serverUser);
-    }
-  };
-
   const shouldNavigate = serverUser.isVerified === true;
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <div className="min-h-screen bg-slate-100 px-4 py-8">
@@ -56,7 +57,7 @@ export default function DashboardPage({ user = null, onLoginSuccess = null }) {
                 serverUser.isVerified ? "text-emerald-600" : "text-rose-600"
               }`}
             >
-              {serverUser.isVerified ? "isVerified" : "isNotVerified"}
+              {serverUser.isVerified ? "Verified" : "Not Verified"}
             </span>
           </div>
         </div>
@@ -73,11 +74,10 @@ export default function DashboardPage({ user = null, onLoginSuccess = null }) {
               Your account is verified and ready to access the dashboard.
             </div>
             <button
-              type="button"
-              className="rounded-2xl bg-sky-700 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-800"
-              onClick={goToDashboard}
+              className="rounded-2xl bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700"
+              onClick={() => handleLogout()}
             >
-              Go Dashboard
+              Logout
             </button>
           </div>
         )}

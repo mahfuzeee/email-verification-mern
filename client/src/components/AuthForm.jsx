@@ -2,6 +2,7 @@ import { useState } from "react";
 import userApi from "../api/userApi";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function AuthForm() {
   const [mode, setMode] = useState("login");
@@ -13,6 +14,8 @@ export default function AuthForm() {
   });
 
   const navigate = useNavigate();
+
+  const { login } = useAuth();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -43,6 +46,7 @@ export default function AuthForm() {
         const res = await userApi.post("/login", formData);
         toast.success(res.data.message);
         if (res.data.success) {
+          login(res.data.user);
           navigate("/dashboard");
         }
       }
