@@ -1,5 +1,6 @@
 import { useState } from "react";
 import userApi from "../api/userApi";
+import { toast } from "react-hot-toast";
 
 export default function AuthForm() {
   const [mode, setMode] = useState("login");
@@ -22,7 +23,7 @@ export default function AuthForm() {
     event.preventDefault();
 
     if (mode === "register" && formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
@@ -33,12 +34,15 @@ export default function AuthForm() {
 
     try {
       if (mode === "register") {
-        await userApi.post("/register", formData);
+        const res = await userApi.post("/register", formData);
+        toast.success(res.data.message);
       } else {
-        await userApi.post("/login", formData);
+        const res = await userApi.post("/login", formData);
+        toast.success(res.data.message);
       }
     } catch (error) {
       console.error(error);
+      toast.error(error.response.data.message);
     }
   };
 

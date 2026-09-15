@@ -1,7 +1,15 @@
-import AuthForm from './components/AuthForm.jsx'
-
+import { BrowserRouter, Routes, Route, Router } from "react-router-dom";
+import AuthForm from "./components/AuthForm.jsx";
 function App() {
-  return <AuthForm />
+  return (
+    <BrowserRouter>
+      <Router>
+        <Routes>
+          <Route path="/" element={<AuthForm />} />
+        </Routes>
+      </Router>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

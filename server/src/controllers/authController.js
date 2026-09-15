@@ -14,7 +14,9 @@ const register = async (req, res) => {
     return res.status(400).json({ error: "All fields are required" });
 
   if (await User.findOne({ email })) {
-    return res.status(400).json({ error: "Email already registered" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Email already registered" });
   }
   const hashed = await bcrypt.hash(password, 10);
   const user = await User.create({ name, email, password: hashed });
@@ -22,9 +24,17 @@ const register = async (req, res) => {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
+
+  //Set token as a cookie
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // Cookie only transmitted over HTTPS in production
+    sameSite: "lax", // Provides solid defense against Cross-Site Request Forgery (CSRF)
+    maxAge: 7 * 24 * 60 * 60 * 1000, // Expiration time in milliseconds (matches the 7-day JWT expiration)
+  });
+
   res.status(201).json({
     status: "success",
-    token,
     user: { id: user._id, name, email },
     message: "A verification link has been sent to your email.",
   });
@@ -48,7 +58,18 @@ const login = async (req, res) => {
     { expiresIn: "7d" },
   );
 
-  res.json({ token });
+  //Set token as a cookie
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // Cookie only transmitted over HTTPS in production
+    sameSite: "lax", // Provides solid defense against Cross-Site Request Forgery (CSRF)
+    maxAge: 7 * 24 * 60 * 60 * 1000, // Expiration time in milliseconds (matches the 7-day JWT expiration)
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Logged in succesfull",
+  });
 };
 
 //Verify Function

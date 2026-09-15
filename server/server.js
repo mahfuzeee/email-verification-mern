@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // Use this to allow all origins (simplest for development)
-app.use(cors());
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.get("/health", (req, res) => res.json({ ok: true }));
 //Using Auth Routes
 app.use("/api/auth", authRoutes);
