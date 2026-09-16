@@ -12,7 +12,9 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 
 const app = express();
+app.set("trust proxy", 1);
 
+//Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
