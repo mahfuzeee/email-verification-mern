@@ -4,9 +4,9 @@ const baseUrl = import.meta.env.VITE_BASE_URL;
 
 const userApi = axios.create({
   baseURL: baseUrl,
+  withCredentials: true,
 });
 
-userApi.defaults.withCredentials = true;
 userApi.interceptors.response.use(
   (response) => {
     return response;

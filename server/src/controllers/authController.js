@@ -7,11 +7,13 @@ const {
   sendOTPEmail,
 } = require("../utils/emailVerification");
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const options = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production", // Cookie only transmitted over HTTPS in production
-  sameSite: "none",
-  maxAge: 7 * 24 * 60 * 60 * 1000, // Expiration time in milliseconds (matches the 7-day JWT expiration)
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
 const getCurrentUser = async (req, res) => {
