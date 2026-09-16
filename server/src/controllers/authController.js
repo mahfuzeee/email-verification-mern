@@ -7,6 +7,13 @@ const {
   sendOTPEmail,
 } = require("../utils/emailVerification");
 
+const options = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production", // Cookie only transmitted over HTTPS in production
+  sameSite: "none",
+  maxAge: 7 * 24 * 60 * 60 * 1000, // Expiration time in milliseconds (matches the 7-day JWT expiration)
+};
+
 const getCurrentUser = async (req, res) => {
   const user = await User.findById(req.user.id).select("-password");
 
@@ -39,12 +46,7 @@ const register = async (req, res) => {
   });
 
   //Set token as a cookie
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Cookie only transmitted over HTTPS in production
-    sameSite: "lax", // Provides solid defense against Cross-Site Request Forgery (CSRF)
-    maxAge: 7 * 24 * 60 * 60 * 1000, // Expiration time in milliseconds (matches the 7-day JWT expiration)
-  });
+  res.cookie("token", token, options);
 
   res.status(201).json({
     status: "success",
@@ -78,12 +80,7 @@ const login = async (req, res) => {
   );
 
   //Set token as a cookie
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Cookie only transmitted over HTTPS in production
-    sameSite: "lax", // Provides solid defense against Cross-Site Request Forgery (CSRF)
-    maxAge: 7 * 24 * 60 * 60 * 1000, // Expiration time in milliseconds (matches the 7-day JWT expiration)
-  });
+  res.cookie("token", token, options);
 
   res.status(200).json({
     success: true,
