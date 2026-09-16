@@ -7,6 +7,19 @@ const {
   sendOTPEmail,
 } = require("../utils/emailVerification");
 
+const getCurrentUser = async (req, res) => {
+  const user = await User.findById(req.user.id).select("-password");
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User not found",
+    });
+  }
+
+  return res.status(200).json(user);
+};
+
 //Resister function
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -155,4 +168,11 @@ const verifyOTP = async (req, res) => {
 };
 
 //Exporting modules
-module.exports = { register, login, verifyByEmail, sendOTP, verifyOTP };
+module.exports = {
+  register,
+  login,
+  getCurrentUser,
+  verifyByEmail,
+  sendOTP,
+  verifyOTP,
+};

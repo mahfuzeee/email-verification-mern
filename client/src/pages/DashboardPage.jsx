@@ -2,7 +2,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth();
+  const { user, loading } = useAuth();
   const serverUser = user || {
     name: "Guest User",
     email: "guest@example.com",
@@ -33,34 +33,48 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 rounded-2xl bg-slate-50 p-6">
-          <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-            <span className="text-sm font-semibold text-slate-500">Name</span>
-            <span className="text-sm font-bold text-slate-900">
-              {serverUser.name}
-            </span>
+        {loading ? (
+          <div className="flex items-center justify-center">
+            <svg
+              aria-hidden="true"
+              className="mr-2 h-8 w-8 animate-spin fill-sky-600 text-gray-200"
+              viewBox="0 0 100 101"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            ></svg>
           </div>
+        ) : (
+          <div className="grid gap-4 rounded-2xl bg-slate-50 p-6">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+              <span className="text-sm font-semibold text-slate-500">Name</span>
+              <span className="text-sm font-bold text-slate-900">
+                {serverUser.name}
+              </span>
+            </div>
 
-          <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-            <span className="text-sm font-semibold text-slate-500">Email</span>
-            <span className="text-sm font-bold text-slate-900">
-              {serverUser.email}
-            </span>
-          </div>
+            <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+              <span className="text-sm font-semibold text-slate-500">
+                Email
+              </span>
+              <span className="text-sm font-bold text-slate-900">
+                {serverUser.email}
+              </span>
+            </div>
 
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-slate-500">
-              Verification
-            </span>
-            <span
-              className={`text-sm font-bold ${
-                serverUser.isVerified ? "text-emerald-600" : "text-rose-600"
-              }`}
-            >
-              {serverUser.isVerified ? "Verified" : "Not Verified"}
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-slate-500">
+                Verification
+              </span>
+              <span
+                className={`text-sm font-bold ${
+                  serverUser.isVerified ? "text-emerald-600" : "text-rose-600"
+                }`}
+              >
+                {serverUser.isVerified ? "Verified" : "Not Verified"}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
 
         {!serverUser.isVerified && (
           <div className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">

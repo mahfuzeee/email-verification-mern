@@ -14,8 +14,7 @@ export default function AuthForm() {
   });
 
   const navigate = useNavigate();
-
-  const { login } = useAuth();
+  const { fetchUser } = useAuth();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -42,11 +41,14 @@ export default function AuthForm() {
       if (mode === "register") {
         const res = await userApi.post("/register", formData);
         toast.success(res.data.message);
+        if (res.data.success) {
+          setFormData("");
+        }
       } else {
         const res = await userApi.post("/login", formData);
         toast.success(res.data.message);
         if (res.data.success) {
-          login(res.data.user);
+          await fetchUser();
           navigate("/dashboard");
         }
       }

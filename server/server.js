@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const connectDB = require("./src/config/db");
 const authRoutes = require("./src/routes/authRoutes");
 
@@ -14,6 +15,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 // Use this to allow all origins (simplest for development)
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.get("/health", (req, res) => res.json({ ok: true }));
