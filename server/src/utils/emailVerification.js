@@ -21,19 +21,17 @@ const sendVerificationEmail = async (user) => {
   user.verificationExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
   await user.save();
 
-  transporter.sendMail(
-    {
+  try {
+    const info = await transporter.sendMail({
       to: user.email,
       subject: "Verify your email.",
       html: `<p>Click <a href='${BASE_URL}/api/auth/verify/${token}'>here</a> to verify your email.</p>`,
-    },
-    (err, info) => {
-      if (err) {
-        console.log(err);
-      }
-      console.log(`Email sent: ${info.response}`);
-    },
-  );
+    });
+    console.log(`Email sent: ${info.response}`);
+  } catch (error) {
+    console.error("Failed to send verification email:", error);
+    throw error;
+  }
 };
 
 //Function for generating and sending OTP to email.
