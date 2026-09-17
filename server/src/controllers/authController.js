@@ -54,7 +54,7 @@ const register = async (req, res) => {
   //res.cookie("token", token, options);
 
   res.status(201).json({
-    status: "success",
+    success: true,
     token,
     user: { id: user._id, name, email },
     message: "A verification link has been sent to your email.",
@@ -72,9 +72,7 @@ const login = async (req, res) => {
   //find user by email
   const user = await User.findOne({ email });
   if (!user)
-    return res
-      .status(401)
-      .json({ success: false, message: "Invalid credentials" });
+    return res.status(401).json({ success: false, message: "User Not Found" });
 
   //check the password
   const match = await bcrypt.compare(password, user.password);
