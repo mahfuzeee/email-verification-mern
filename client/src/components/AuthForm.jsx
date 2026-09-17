@@ -42,12 +42,18 @@ export default function AuthForm() {
         const res = await userApi.post("/register", formData);
         toast.success(res.data.message);
         if (res.data.success) {
+          const token = res.data.token;
+          localStorage.setItem("token", token);
+          await fetchUser();
+          navigate("/dashboard");
           setFormData("");
         }
       } else {
         const res = await userApi.post("/login", formData);
         toast.success(res.data.message);
         if (res.data.success) {
+          const token = res.data.token;
+          localStorage.setItem("token", token);
           await fetchUser();
           navigate("/dashboard");
         }
