@@ -7,6 +7,9 @@ const userApi = axios.create({
   withCredentials: true,
 });
 
+// Force headers on every single request type
+api.defaults.withCredentials = true;
+
 userApi.interceptors.response.use(
   (response) => {
     return response;
