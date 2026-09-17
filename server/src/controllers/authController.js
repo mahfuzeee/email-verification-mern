@@ -34,7 +34,9 @@ const getCurrentUser = async (req, res) => {
 const register = async (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password)
-    return res.status(400).json({ error: "All fields are required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
 
   if (await User.findOne({ email })) {
     return res
@@ -49,10 +51,11 @@ const register = async (req, res) => {
   });
 
   //Set token as a cookie
-  res.cookie("token", token, options);
+  //res.cookie("token", token, options);
 
   res.status(201).json({
-    status: "success",
+    success: true,
+    token,
     user: { id: user._id, name, email },
     message: "A verification link has been sent to your email.",
   });
@@ -61,13 +64,15 @@ const register = async (req, res) => {
 //Login Function
 const login = async (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password)
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
 
   //find user by email
   const user = await User.findOne({ email });
   if (!user)
-    return res
-      .status(401)
-      .json({ success: false, message: "Invalid credentials" });
+    return res.status(401).json({ success: false, message: "User Not Found" });
 
   //check the password
   const match = await bcrypt.compare(password, user.password);
@@ -83,12 +88,13 @@ const login = async (req, res) => {
   );
 
   //Set token as a cookie
-  res.cookie("token", token, options);
+  //res.cookie("token", token, options);
 
   res.status(200).json({
     success: true,
     message: "Logged in succesfull",
-    user,
+    token,
+    user: { id: user._id, name: user.name, email: user.email },
   });
 };
 
@@ -114,7 +120,9 @@ const verifyByEmail = async (req, res) => {
     user.verificationExpiresAt = undefined; //clear expire time
     await user.save();
 
-    res.send("Email verified successfully!");
+    res
+      .status(200)
+      .send({ success: true, message: "Email verified successfully!" });
   } catch (err) {
     res.status(500).json({ message: "Server Error.!" });
   }
